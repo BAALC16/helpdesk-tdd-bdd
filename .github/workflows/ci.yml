@@ -1,75 +1,21 @@
 name: CI Pipeline
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [push]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
       
-      - name: 🔧 Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 20
       
-      - name: 📦 Install dependencies
-        run: npm install
+      - name: Run lint
+        run: npm run lint
       
-      - name: 🔍 Run ESLint (non-blocking)
-        run: npm run lint || echo "Lint warnings ignored"
-        continue-on-error: true
-      
-      - name: 🧪 Run tests with coverage
-        run: npm test
-        continue-on-error: false
-      
-      - name: ✅ Build success
-        run: echo "All tests passed!"
-```
-
-**Changements clés :**
-- `npm install` au lieu de `npm ci` (plus permissif)
-- `continue-on-error: true` sur le lint
-- Pas de matrix Node.js pour l'instant
-
----
-
-### 3. Ordre de création des fichiers
-
-Pour éviter les erreurs, créez les fichiers dans cet ordre :
-
-#### ✅ Étape 1 : Configuration de base
-```
-1. package.json
-2. jest.config.js
-3. .eslintrc.json
-4. .github/workflows/ci.yml
-```
-
-#### ✅ Étape 2 : Code source (GREEN)
-```
-5. src/ticketValidator.js    ← Commencez par celui-ci !
-6. src/ticket.js
-```
-
-**Commit :** `🟢 GREEN: Implement ticket creation logic`
-
-#### ✅ Étape 3 : Tests (RED)
-```
-7. tests/ticket.test.js
-```
-
-**Commit :** `🔴 RED: Add unit tests`
-
-#### ✅ Étape 4 : BDD (optionnel pour l'instant)
-```
-8. tests/features/ticket-creation.feature
-9. tests/features/steps/ticket.steps.js
+      - name: Run tests
+        run: npm run test
