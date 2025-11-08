@@ -1,53 +1,26 @@
-const TicketValidator = require('./ticketValidator');
-
-let ticketCounter = 1;
-
 class Ticket {
   constructor({ titre, description, categorie }) {
     // Validation
-    TicketValidator.validate({ titre, description, categorie });
+    if (!titre || titre.trim().length < 5) {
+      throw new Error('Le titre doit contenir au moins 5 caractères');
+    }
     
-    // Génération ID unique
-    this.id = `HELP-${String(ticketCounter++).padStart(4, '0')}`;
+    if (!description || description.trim().length < 20) {
+      throw new Error('La description doit contenir au moins 20 caractères');
+    }
     
-    // Nettoyage données
+    const categories = ['Matériel', 'Logiciel', 'Réseau', 'Accès', 'Autre'];
+    if (!categories.includes(categorie)) {
+      throw new Error('Catégorie invalide');
+    }
+    
+    // Données
+    this.id = `HELP-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
     this.titre = titre.trim();
     this.description = description.trim();
     this.categorie = categorie;
-    
-    // Métadonnées
     this.statut = 'NOUVEAU';
     this.createdAt = new Date();
-    
-    // Auto-assignation équipe
-    this.equipeAssignee = this._getEquipeByCategorie(categorie);
-    
-    // Simulation notifications
-    this.emailSent = true;
-    this.notificationEquipe = true;
-  }
-
-  _getEquipeByCategorie(categorie) {
-    const mapping = {
-      'Matériel': 'Support Matériel',
-      'Logiciel': 'Support Logiciel',
-      'Réseau': 'Support Réseau',
-      'Accès': 'Support IT',
-      'Autre': 'Support Général'
-    };
-    return mapping[categorie];
-  }
-
-  toJSON() {
-    return {
-      id: this.id,
-      titre: this.titre,
-      description: this.description,
-      categorie: this.categorie,
-      statut: this.statut,
-      equipeAssignee: this.equipeAssignee,
-      createdAt: this.createdAt
-    };
   }
 }
 
